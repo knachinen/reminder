@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'reminder.dart';
 import 'create_reminder_screen.dart'; // Import the CreateReminderScreen
+import 'package:shared_preferences/shared_preferences.dart'; // Import SharedPreferences
+import 'dart:convert'; // For JSON encoding/decoding
 // For JSON encoding/decoding
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest.dart' as tz;
@@ -29,6 +31,8 @@ class _ReminderListScreenState extends State<ReminderListScreen> {
   Future<void> _initializeNotifications() async {
     const AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('@mipmap/ic_launcher');
+    const DarwinInitializationSettings initializationSettingsMacOS =
+        DarwinInitializationSettings();
     final InitializationSettings initializationSettings =
         InitializationSettings(android: initializationSettingsAndroid);
     await flutterLocalNotificationsPlugin.initialize(initializationSettings);
@@ -47,11 +51,14 @@ class _ReminderListScreenState extends State<ReminderListScreen> {
           'reminder_channel',
           'Reminder Channel',
           channelDescription: 'Channel for Reminder notifications',
+          // androidScheduleMode: AndroidScheduleMode.exact,
         ),
+        macOS: DarwinNotificationDetails(),
       ),
-      androidAllowWhileIdle: true,
-      uiLocalNotificationDateInterpretation:
-          UILocalNotificationDateInterpretation.absoluteTime,
+      androidScheduleMode: AndroidScheduleMode.exact,
+      // androidAllowWhileIdle: true,
+      // uiLocalNotificationDateInterpretation:
+      // UILocalNotificationDateInterpretation.absoluteTime,
     );
   }
 
