@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'reminder_provider.dart';
 import 'reminder.dart';
+import 'dart:html' as html;
 
 class CreateReminderScreen extends StatefulWidget {
   const CreateReminderScreen({super.key});
@@ -41,9 +44,7 @@ class _CreateReminderScreenState extends State<CreateReminderScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Create Reminder'),
-      ),
+      appBar: AppBar(title: Text('Create Reminder')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -70,7 +71,14 @@ class _CreateReminderScreenState extends State<CreateReminderScreen> {
                   text: _textController.text,
                   dateTime: _selectedDateTime,
                 );
-                Navigator.pop(context, newReminder); // Pass the new reminder back
+                Provider.of<ReminderProvider>(
+                  context,
+                  listen: false,
+                ).addReminder(newReminder);
+                Navigator.pop(
+                  context,
+                  newReminder,
+                ); // Pass the new reminder back
               },
               child: Text('Save Reminder'),
             ),

@@ -8,6 +8,8 @@ import 'dart:convert'; // For JSON encoding/decoding
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
+import 'package:provider/provider.dart';
+import 'reminder_provider.dart';
 
 class ReminderListScreen extends StatefulWidget {
   const ReminderListScreen({super.key});
@@ -95,31 +97,35 @@ class _ReminderListScreenState extends State<ReminderListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('Reminders')),
-      body: ListView.builder(
-        itemCount: reminders.length,
-        itemBuilder: (context, index) {
-          final reminder = reminders[index];
-          return Dismissible(
-            key: Key(reminder.id), // Use the reminder's ID as the key
-            onDismissed: (direction) {
-              setState(() {
-                _cancelNotification(reminder.id.hashCode);
-                reminders.removeAt(index);
-                _saveReminders();
-              });
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('${reminder.text} deleted')),
+      body: Consumer<ReminderProvider>(
+        builder: (context, provider, child) {
+          return ListView.builder(
+            itemCount: reminders.length,
+            itemBuilder: (context, index) {
+              final reminder = reminders[index];
+              return Dismissible(
+                key: Key(reminder.id), // Use the reminder's ID as the key
+                onDismissed: (direction) {
+                  setState(() {
+                    _cancelNotification(reminder.id.hashCode);
+                    reminders.removeAt(index);
+                    _saveReminders();
+                  });
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('${reminder.text} deleted')),
+                  );
+                },
+                background: Container(
+                  color: Colors.red,
+                ), // Background color when swiping
+                child: ListTile(
+                  title: Text(reminder.text),
+                  subtitle: Text(
+                    DateFormat('yyyy-MM-dd HH:mm').format(reminder.dateTime),
+                  ),
+                ),
               );
             },
-            background: Container(
-              color: Colors.red,
-            ), // Background color when swiping
-            child: ListTile(
-              title: Text(reminder.text),
-              subtitle: Text(
-                DateFormat('yyyy-MM-dd HH:mm').format(reminder.dateTime),
-              ),
-            ),
           );
         },
       ),
